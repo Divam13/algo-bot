@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package alpha_engine;
+
+service BacktestService {
+  rpc RunBacktest (BacktestRequest) returns (BacktestResponse) {}
+}
+
+message Bar {
+  int64 timestamp = 1;
+  double open = 2;
+  double high = 3;
+  double low = 4;
+  double close = 5;
+  double volume = 6;
+}
+
+message StrategyConfig {
+  string strategy_id = 1;
+  map<string, string> parameters = 2; // Parameters serialized as strings
+  double initial_capital = 3;
+  double commission_rate = 4;
+  double slippage_bps = 5;
+}
+
+message BacktestRequest {
+  string job_id = 1;
+  repeated Bar data = 2;
+  StrategyConfig config = 3;
+}
+
+message Trade {
+  int64 timestamp = 1;
+  string symbol = 2;
+  string type = 3; // "BUY" or "SELL"
+  double price = 4;
+  double quantity = 5;
+  double pnl = 6;
+}
+
+message EquityPoint {
+  int64 timestamp = 1;
+  double equity = 2;
+}
+
+message BacktestResponse {
+  string job_id = 1;
+  bool success = 2;
+  string message = 3;
+  
+  repeated Trade trades = 4;
+  repeated EquityPoint equity_curve = 5;
+  
+  // Key Metrics
+  double total_return = 6;
+  double sharpe_ratio = 7;
+  double max_drawdown = 8;
+  double win_rate = 9;
+  int32 total_trades = 10;
+}
